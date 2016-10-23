@@ -1,11 +1,12 @@
 {
-  "name": "app",
+  "name": "spider4yyh",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "^2.1.2",
     "body-parser": "~1.15.1",
     "bufferhelper": "^0.2.1",
     "cheerio": "^0.22.0",
@@ -13,10 +14,10 @@
     "debug": "~2.2.0",
     "ejs": "^2.5.2",
     "express": "~4.13.4",
-    "http": "0.0.0",
     "iconv-lite": "^0.4.13",
     "jade": "~1.11.0",
     "morgan": "~1.7.0",
+    "q": "^1.4.1",
     "serve-favicon": "~2.3.0"
   }
 }

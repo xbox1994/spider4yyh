@@ -8,7 +8,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-  res.render('index', { result: spider.run(req.body) });
+  spider.run(req.body, res);
 });
 
 module.exports = router;
