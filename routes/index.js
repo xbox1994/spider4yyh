@@ -4,7 +4,7 @@ var spider = require('../spider')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { result: 'for yyh' });
+  res.render('index', { result: '' });
 });
 
 router.post('/', function(req, res, next) {

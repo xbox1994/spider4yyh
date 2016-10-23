@@ -1,7 +1,6 @@
 var https = require('https');
 var fs = require('fs');
 var cheerio = require('cheerio');
-var request = require('request');
 var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');
 var URL = require('url');
@@ -19,19 +18,13 @@ function options(hostname,path,cookie){
         headers: {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
             'cookie': cookie,
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'accept-encoding' : 'gzip, deflate, sdch, br',
-            'accept-language' : 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-            'cache-control' : 'no-cache',
-            'dnt' : 1,
-            'pragma' : 'no-cache',
-            'upgrade-insecure-requests' : 1
         }
     }
 };
 
 function tMailSearchResultOptions(keyword,s) {
-    return options('list.tmall.com','/search_product.htm?q='+encodeURI(keyword)+"&s="+s,'cna=fVICEO3ORiICAT23ilKdkGPH; _med=dw:1440&dh:900&pw:2880&ph:1800&ist:0; tracknick=thank007007; t=c6a45bd9d1fc50228ee1f682d300d6c2; _tb_token_=J9Jl9HFo8gc3; cookie2=72c76320a78bd18d01283ada8585ed79; pnm_cku822=017UW5TcyMNYQwiAiwZTXFIdUh1SHJOe0BuOG4%3D%7CUm5OcktxS3RKdkp1TXRPdyE%3D%7CU2xMHDJ7G2AHYg8hAS8XLgAgDkkgS2UzZQ%3D%3D%7CVGhXd1llXGZcY11hXWJaY1hgV2pIfUlyTnpAdEpyR31EeEF1TmA2%7CVWldfS0SMgk2FigIJlVyVXstew%3D%3D%7CVmhIGCccPAEhHSQbIwM4BTsBIR0kHSAANAk0FCgRKBU1ADwDVQM%3D%7CV25Tbk5zU2xMcEl1VWtTaUlwJg%3D%3D; res=scroll%3A1425*5979-client%3A1425*309-offset%3A1425*5979-screen%3A1440*900; cq=ccp%3D1; l=AtLSgK04qp2FaiZQlaj2-WLUopK0k9bx; isg=Avz8C_jpiIMQQrPXCFOndiM8zZwbiKAffljt0NZ9eOdGoZ0r_Qa2ryFT734j');
+    console.log('/search_product.htm?q='+encodeURI(keyword)+"&s="+s);
+    return options('list.tmall.com','/search_product.htm?q='+encodeURI(keyword)+"&s="+s,'cna=fVICEO3ORiICAT23ilKdkGPH; _med=dw:1440&dh:900&pw:2880&ph:1800&ist:0; cq=ccp%3D0; _tb_token_=J9Jl9HFo8gc3; ck1=; uc1=cookie14=UoWwI9%2BGZ8dSGg%3D%3D&lng=zh_CN&cookie16=WqG3DMC9UpAPBHGz5QBErFxlCA%3D%3D&existShop=false&cookie21=U%2BGCWk%2F7pY%2FF&tag=7&cookie15=UIHiLt3xD8xYTw%3D%3D&pas=0; uc3=sg2=VFc2%2F%2BBTaxORR3JhOsLot0m%2Fo03VpzpmJ7%2BMidM7UCM%3D&nk2=F55rWnbBGzFgPwU%3D&id2=UoH8WADqwMSrzA%3D%3D&vt3=F8dAS18%2BAw2mv7IdRkY%3D&lg2=UIHiLt3xD8xYTw%3D%3D; lgc=thank007007; tracknick=thank007007; cookie2=72c76320a78bd18d01283ada8585ed79; cookie1=UoM7yWpINCvuAeiCY0%2FnCXZ4%2Fe0DHznpMIrungsLrRs%3D; unb=1035160900; t=c6a45bd9d1fc50228ee1f682d300d6c2; skt=ceca18d5fd290b92; _nk_=thank007007; _l_g_=Ug%3D%3D; cookie17=UoH8WADqwMSrzA%3D%3D; hng=; uss=UIHwfPgem4he4CYU33wj%2FPacZjGiPU6OPK%2FVv054ZuKnBaN6faSnmk6palI%3D; login=true; _m_user_unitinfo_=center; _m_h5_tk=ff4b22bd9a333175d59e7a6c63071f9a_1477237768514; _m_h5_tk_enc=fa419f5f70d71db7fdefc22738f1debe; tt=tmall-main; pnm_cku822=201UW5TcyMNYQwiAiwZTXFIdUh1SHJOe0BuOG4%3D%7CUm5OcktxS3RKdE13Q3dKcCY%3D%7CU2xMHDJ7G2AHYg8hAS8XLgAgDkkgS2UzZQ%3D%3D%7CVGhXd1llXGZcY11jWmBUYF1nUG1PekZ4TXdNckp0SnRMc0x1S2Uz%7CVWldfS0QMAUxBCQYJAQqASQSZhI8ajw%3D%7CVmhIGCccPAEhHSQbIwM4BzoAIBwlHCEBNQg1FSkQKRQ0AT0CVAI%3D%7CV25Tbk5zU2xMcEl1VWtTaUlwJg%3D%3D; res=scroll%3A1425*6207-client%3A1425*342-offset%3A1425*6207-screen%3A1440*900; l=AtfX/qKqN97IHcNjQAc7WjDH50EhQKt-; isg=AmRk09UH4Ns3XhufoEu_vvu0NWTY04hnFuBFmH6FrC_yKQXzpg7g99TLhzbL');
 };
 
 function tMailShopRedirectOptions(user_number_id){
@@ -39,7 +32,7 @@ function tMailShopRedirectOptions(user_number_id){
 }
 
 function tMailShopDetailOptions(url,path){
-    return options(url,path,'cna=fVICEO3ORiICAT23ilKdkGPH; tracknick=thank007007; t=c6a45bd9d1fc50228ee1f682d300d6c2; _tb_token_=J9Jl9HFo8gc3; cookie2=72c76320a78bd18d01283ada8585ed79; pnm_cku822=; cq=ccp%3D1; l=AkdHq6Etpy7YbVOTUFeLCqD4V/ERTBsu; isg=AtXVAIY5IRiOdgrsSRQe3VLz5NcDbYnkD0c0C1d6kcybrvWgHyKZtONsFgXi');
+    return options(url,path,'cna=fVICEO3ORiICAT23ilKdkGPH; _med=dw:1440&dh:900&pw:2880&ph:1800&ist:0; cq=ccp%3D0; _tb_token_=J9Jl9HFo8gc3; ck1=; uc1=cookie14=UoWwI9%2BGZ8dSGg%3D%3D&lng=zh_CN&cookie16=WqG3DMC9UpAPBHGz5QBErFxlCA%3D%3D&existShop=false&cookie21=U%2BGCWk%2F7pY%2FF&tag=7&cookie15=UIHiLt3xD8xYTw%3D%3D&pas=0; uc3=sg2=VFc2%2F%2BBTaxORR3JhOsLot0m%2Fo03VpzpmJ7%2BMidM7UCM%3D&nk2=F55rWnbBGzFgPwU%3D&id2=UoH8WADqwMSrzA%3D%3D&vt3=F8dAS18%2BAw2mv7IdRkY%3D&lg2=UIHiLt3xD8xYTw%3D%3D; lgc=thank007007; tracknick=thank007007; cookie2=72c76320a78bd18d01283ada8585ed79; cookie1=UoM7yWpINCvuAeiCY0%2FnCXZ4%2Fe0DHznpMIrungsLrRs%3D; unb=1035160900; t=c6a45bd9d1fc50228ee1f682d300d6c2; skt=ceca18d5fd290b92; _nk_=thank007007; _l_g_=Ug%3D%3D; cookie17=UoH8WADqwMSrzA%3D%3D; hng=; uss=UIHwfPgem4he4CYU33wj%2FPacZjGiPU6OPK%2FVv054ZuKnBaN6faSnmk6palI%3D; login=true; _m_user_unitinfo_=center; _m_h5_tk=ff4b22bd9a333175d59e7a6c63071f9a_1477237768514; _m_h5_tk_enc=fa419f5f70d71db7fdefc22738f1debe; tt=tmall-main; pnm_cku822=201UW5TcyMNYQwiAiwZTXFIdUh1SHJOe0BuOG4%3D%7CUm5OcktxS3RKdE13Q3dKcCY%3D%7CU2xMHDJ7G2AHYg8hAS8XLgAgDkkgS2UzZQ%3D%3D%7CVGhXd1llXGZcY11jWmBUYF1nUG1PekZ4TXdNckp0SnRMc0x1S2Uz%7CVWldfS0QMAUxBCQYJAQqASQSZhI8ajw%3D%7CVmhIGCccPAEhHSQbIwM4BzoAIBwlHCEBNQg1FSkQKRQ0AT0CVAI%3D%7CV25Tbk5zU2xMcEl1VWtTaUlwJg%3D%3D; res=scroll%3A1425*6207-client%3A1425*342-offset%3A1425*6207-screen%3A1440*900; l=AtfX/qKqN97IHcNjQAc7WjDH50EhQKt-; isg=AmRk09UH4Ns3XhufoEu_vvu0NWTY04hnFuBFmH6FrC_yKQXzpg7g99TLhzbL');
 }
 
 var spider = {
@@ -57,7 +50,6 @@ var spider = {
                 var htmlContent = new BufferHelper();
 
                 if(res.statusCode == 302){
-                    console.log(res.statusCode);
                     response.render('index', { result:  "搜索频率过高!"});
                 }
 
@@ -67,52 +59,49 @@ var spider = {
 
                 res.on('end', function () {
                     var $ = cheerio.load(iconv.decode(htmlContent.toBuffer(), 'gbk'));
+                    console.log($('.productShop-name').length);
                     for(var i = 0 ; i < $('.productShop-name').length ; i++){
                         var shopNameDom = $('.productShop-name')[i];
                         var shopNameId = shopNameDom.attribs.href.substring(user_number_id_index,shopNameDom.attribs.href.indexOf('&'));
-
-                        console.log(i,",",soleShopArray.length,shopNameId);
                         if(_.contains(soleShopArray,shopNameId)){
                             continue;
                         }else{
                             soleShopArray.push(shopNameId);
                         }
 
-                    }
-                    for(var i = 0 ; i < soleShopArray.length ; i++){
-                        //2.第一次重定向
-                        var redirectReq1 = https.request(tMailShopRedirectOptions(shopNameId),function(res){
-                            var redirect1Url = res.headers.location;
-                            //3.第二次重定向
-                            var redirectReq2 = https.get(redirect1Url,function(ress){
-                                //4.真实url
-                                var realUrl = URL.parse(ress.headers.location);
-                                var realShopReq = https.request(tMailShopDetailOptions(realUrl.hostname,realUrl.path),function(res){
-                                    var htmlContent = new BufferHelper();
-                                    res.on('data', function (chunk) {
-                                        htmlContent.concat(chunk);
-                                    });
-                                    res.on('end', function () {
-                                        processedCount ++;
-                                        var $ = cheerio.load(iconv.decode(htmlContent.toBuffer(), 'gbk'));
-                                        var area = $("li.locus div.right").text().trim();
-                                        //匹配输入地区的店铺
-                                        console.log(processedCount,"-",soleShopArray.length);
-                                        if(body.area.indexOf(area) >= 0){
-                                            var shopUrl = ress.headers.location;
-                                            result.push(shopUrl);
-                                        }
-                                        if(processedCount === soleShopArray.length){
-                                            response.render('index', { result:  result});
-                                        }
-                                    });
+                            //2.第一次重定向
+                            var redirectReq1 = https.request(tMailShopRedirectOptions(shopNameId),function(res){
+                                var redirect1Url = res.headers.location;
+                                //3.第二次重定向
+                                var redirectReq2 = https.get(redirect1Url,function(ress){
+                                    //4.真实url
+                                    var realUrl = URL.parse(ress.headers.location);
+                                    var realShopReq = https.request(tMailShopDetailOptions(realUrl.hostname,realUrl.path),function(res){
+                                        var htmlContent = new BufferHelper();
+                                        res.on('data', function (chunk) {
+                                            htmlContent.concat(chunk);
+                                        });
+                                        res.on('end', function () {
+                                            processedCount ++;
+                                            var $ = cheerio.load(iconv.decode(htmlContent.toBuffer(), 'gbk'));
+                                            var area = $("li.locus div.right").text().trim();
+                                            //匹配输入地区的店铺
+                                            console.log(body.area,",",area,processedCount,"-",soleShopArray.length);
+                                            if(body.area.indexOf(area) >= 0){
+                                                var shopUrl = ress.headers.location;
+                                                result.push(shopUrl);
+                                            }
+                                            if(processedCount === soleShopArray.length){
+                                                response.render('index', { result:  result});
+                                            }
+                                        });
 
-                                })
-                                realShopReq.end();
+                                    })
+                                    realShopReq.end();
+                                });
+                                redirectReq2.end();
                             });
-                            redirectReq2.end();
-                        });
-                        redirectReq1.end();
+                            redirectReq1.end();
                     }
                 });
             }).end();
