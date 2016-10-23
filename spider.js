@@ -50,7 +50,7 @@ var spider = {
                 var htmlContent = new BufferHelper();
 
                 if(res.statusCode == 302){
-                    response.render('index', { result:  "搜索频率过高!"});
+                    response.render('index', { result:  "搜索频率过高1!"});
                 }
 
                 res.on('data', function (chunk) {
@@ -78,6 +78,10 @@ var spider = {
                                     var realUrl = URL.parse(ress.headers.location);
                                     var realShopReq = https.request(tMailShopDetailOptions(realUrl.hostname,realUrl.path),function(res){
                                         var htmlContent = new BufferHelper();
+                                        if(res.statusCode == 302){
+                                            response.render('index', { result:  "搜索频率过高2!"});
+                                        }
+
                                         res.on('data', function (chunk) {
                                             htmlContent.concat(chunk);
                                         });
