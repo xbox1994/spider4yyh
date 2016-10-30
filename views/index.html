@@ -12,17 +12,43 @@
     <![endif]-->
     <!-- styles -->
     <link href="stylesheets/style.css" rel="stylesheet">
+    <script src="javascripts/jquery.min.js"></script>
+    <script src="javascripts/socket.io.js"></script>
 
 </head>
 <body>
-    <form method="post" action="/">
-        关键词(品牌名/商品名)<input type="text" name="keyword">
-        地区<input type="text" name="area">
-        搜索第<input type="text" name="pageCount">页
+    <form id="info" method="post" action="/">
+        关键词(品牌名/商品名)<input id="keyword" type="text" name="keyword">
+        地区<input type="text" id="area" name="area">
+        搜索前<input type="text" id="pageCount" name="pageCount">页
         <button type="submit">搜索</button>
     </form>
-    <% for(var i=0; i<result.length ; i++){%>
-        <a href='<%= result[i] %>' target="_blank"><%= result[i] %></a><br>
-    <%}%>
+    <div id="result"></div><br>
+    progress:<div id="progress"></div>
 </body>
+<script>
+    $( document ).ready(function() {
+        var socket = io();
+        $("#info").submit(function(){
+            $("#result").empty();
+            $("#result").append("searching...<br>");
+            var d = {};
+            var t = $('#info').serializeArray();
+            $.each(t, function() {
+                d[this.name] = this.value;
+            });
+            socket.emit('searchInfo', JSON.stringify(d));
+
+            return false;
+        });
+        socket.on('searchResult', function (data) {
+            if(data === "finished!"){
+                $("#result").append(data);
+            }else{
+                $("#progress").text(data.progress);
+                $("#result").append("<a href='"+data.url+"' target='_blank'>"+data.url+"</a><br>");
+            }
+        });
+    });
+</script>
 </html>

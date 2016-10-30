@@ -34,72 +34,67 @@ function tMailShopDetailOptions(url, path) {
     return options(url, path);
 }
 
-var spider = {
+var tMallShopDetailSpider = {
 
-    run: function (body, response) {
+    run: function (body, callback) {
         var soleShopArray = new Array();
         var processedCount = 0;
-        var result = new Array();
-
 
         //0.请求pageCount个页面
         var tasksToGo = body.pageCount;
+        console.log(body.pageCount);
         for (var i = 1; i <= tasksToGo; i++) {
             var s = i * 60;
             requestTMallSearchResult(s);
         }
 
+        function render(){
+            if(++processedCount === soleShopArray.length){
+                callback("finished!");
+            }
+        }
+
         //4.具体店铺信息,真实URL
-        function requestShopDetail(realUrl, ress) {
+
+        function requestShopDetail(realUrl) {
+            var realUrl = URL.parse(realUrl);
             var realShopReq = https.request(tMailShopDetailOptions(realUrl.hostname, realUrl.path), function (res) {
                 var htmlContent = new BufferHelper();
-                if (res.statusCode == 302) {
-                    response.render('index', {result: "搜索频率过高2!"});
-                }
 
                 res.on('data', function (chunk) {
                     htmlContent.concat(chunk);
                 });
                 res.on('end', function () {
-                    processedCount++;
-                    console.log(processedCount, soleShopArray.length);
                     var $ = cheerio.load(iconv.decode(htmlContent.toBuffer(), 'gbk'));
                     var area = $("li.locus div.right").text().trim();
                     //匹配输入地区的店铺
                     if (area.indexOf(body.area) >= 0) {
                         console.log("!!!", "found", "!!!", area);
-                        var shopUrl = ress.headers.location;
-                        result.push(shopUrl);
+                        callback({url:realUrl.href, progress:processedCount + "/" + soleShopArray.length});
                     }
-                    if (processedCount === soleShopArray.length) {
-                        response.render('index', {result: result});
-                    }
+                    render();
+                    console.log(processedCount + "/" + soleShopArray.length);
                 });
-                res.on('error', function(e){
-                    console.error(e);
-                    if (++processedCount === soleShopArray.length) {
-                        response.render('index', {result: result});
-                    }
-                })
+            });
+            realShopReq.on('error', function (e) {
+                console.log(e);
+                render();
             });
             realShopReq.end();
         }
 
         //3.第二次重定向
         function requestRedirect2(redirect1Url) {
-            var redirectReq2 = https.get(redirect1Url, function (ress) {
-                if (ress.headers.location !== undefined) {
-                    var realUrl = URL.parse(ress.headers.location);
-                    requestShopDetail(realUrl, ress);
+            var redirectReq2 = https.get(redirect1Url, function (res) {
+                if (res.headers.location !== undefined) {
+                    requestShopDetail(res.headers.location);
                 } else {
-                    processedCount++;
+                    render();
                 }
-                ress.on('error', function(e){
-                    console.error(e);
-                    if (++processedCount === soleShopArray.length) {
-                        response.render('index', {result: result});
-                    }
-                })
+            });
+            redirectReq2.on('error', function (e) {
+                console.log(e);
+                render();
             });
             redirectReq2.end();
         }
@@ -109,12 +104,10 @@ var spider = {
             var redirectReq1 = https.request(tMailShopRedirectOptions(shopNameId), function (res) {
                 var redirect1Url = res.headers.location;
                 requestRedirect2(redirect1Url);
-                res.on('error', function(e){
-                    console.error(e);
-                    if (++processedCount === soleShopArray.length) {
-                        response.render('index', {result: result});
-                    }
-                })
+            });
+            redirectReq1.on('error', function (e) {
+                console.log(e);
+                render();
             });
             redirectReq1.end();
             return redirectReq1;
@@ -129,7 +122,7 @@ var spider = {
                 if (_.contains(soleShopArray, shopNameId)) {
                     continue;
                 } else {
-                    console.log(i, "-", soleShopArray.length);
+                    console.log(i + ">>" + soleShopArray.length);
                     soleShopArray.push(shopNameId);
                 }
             }
@@ -142,13 +135,8 @@ var spider = {
 
         //1.按关键词搜索某一页所有产品
         function requestTMallSearchResult(s) {
-            console.log("why request twice?");
             https.request(tMailSearchResultOptions(body.keyword, s), function (res) {
                 var htmlContent = new BufferHelper();
-
-                if (res.statusCode == 302) {
-                    response.render('index', {result: "搜索频率过高1!"});
-                }
 
                 res.on('data', function (chunk) {
                     htmlContent.concat(chunk);
@@ -162,6 +150,8 @@ var spider = {
     }
 };
 
-module.exports = spider;
-//nodejs用成单任务单线程了我曹,一直在等待IO,这完全没用到Nodejs的强大之处啊
-//错误如何处理throw er; // Unhandled 'error' event Error: read ECONNRESET
+module.exports = tMallShopDetailSpider;
+
+//1.如何延时发送异步请求
+//2.多次请求之间导致的错误情况复杂难以统计导致无法统计已经处理过的数量
+//3.socket一打开页面就保持了,能不能点击打开处理完成后关闭
