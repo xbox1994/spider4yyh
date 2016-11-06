@@ -59,6 +59,13 @@ var tMallShopDetailSpider = {
         function requestShopDetail(realUrl) {
             var realUrl = URL.parse(realUrl);
             var realShopReq = https.request(tMailShopDetailOptions(realUrl.hostname, realUrl.path), function (res) {
+
+                console.log(res.headers.location,res.statusCode);
+
+                if(res.statusCode == 302){
+                    requestShopDetail(res.headers.location);
+                    return;
+                }
                 var htmlContent = new BufferHelper();
 
                 res.on('data', function (chunk) {
@@ -67,6 +74,10 @@ var tMallShopDetailSpider = {
                 res.on('end', function () {
                     var $ = cheerio.load(iconv.decode(htmlContent.toBuffer(), 'gbk'));
                     var area = $("li.locus div.right").text().trim();
+                    if(area.length === 0){
+                        area = $(".tb-certificate").text().trim();
+                    }
+                    console.log(area);
                     //匹配输入地区的店铺
                     if (area.indexOf(body.area) >= 0) {
                         console.log("!!!", "found", "!!!", area);
@@ -86,6 +97,7 @@ var tMallShopDetailSpider = {
         //3.第二次重定向
         function requestRedirect2(redirect1Url) {
             var redirectReq2 = https.get(redirect1Url, function (res) {
+                console.log(res.headers.location,res.statusCode);
                 if (res.headers.location !== undefined) {
                     requestShopDetail(res.headers.location);
                 } else {
@@ -102,6 +114,7 @@ var tMallShopDetailSpider = {
         //2.第一次重定向
         function requestRedirect1(shopNameId) {
             var redirectReq1 = https.request(tMailShopRedirectOptions(shopNameId), function (res) {
+                console.log(res.headers.location,res.statusCode);
                 var redirect1Url = res.headers.location;
                 requestRedirect2(redirect1Url);
             });
@@ -137,7 +150,6 @@ var tMallShopDetailSpider = {
         function requestTMallSearchResult(s) {
             https.request(tMailSearchResultOptions(body.keyword, s), function (res) {
                 var htmlContent = new BufferHelper();
-
                 res.on('data', function (chunk) {
                     htmlContent.concat(chunk);
                 });

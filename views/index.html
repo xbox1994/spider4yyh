@@ -44,6 +44,7 @@
         socket.on('searchResult', function (data) {
             if(data === "finished!"){
                 $("#result").append(data);
+                $("#progress").text();
             }else{
                 $("#progress").text(data.progress);
                 $("#result").append("<a href='"+data.url+"' target='_blank'>"+data.url+"</a><br>");
