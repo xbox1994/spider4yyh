@@ -43,8 +43,10 @@
         });
         socket.on('searchResult', function (data) {
             if(data === "finished!"){
-                $("#result").append(data);
-                $("#progress").text("");
+                $("#progress").text(data);
+            }else if(data.url === undefined){
+                console.log(data.progress);
+                $("#progress").text(data.progress);
             }else{
                 $("#progress").text(data.progress);
                 $("#result").append("<a href='"+data.url+"' target='_blank'>"+data.url+"</a><br>");

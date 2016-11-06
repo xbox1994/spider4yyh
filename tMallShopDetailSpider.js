@@ -80,8 +80,10 @@ var tMallShopDetailSpider = {
                     //匹配输入地区的店铺
                     if (area.indexOf(body.area) >= 0) {
                         console.log("!!!", "found", "!!!", area);
+                        callback({url:realUrl.href, progress:processedCount + "/" + soleShopArray.length});
+                    }else{
+                        callback({progress:processedCount + "/" + soleShopArray.length});
                     }
-                    callback({url:realUrl.href, progress:processedCount + "/" + soleShopArray.length});
                     render();
                     console.log(processedCount + "/" + soleShopArray.length);
                 });
