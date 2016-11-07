@@ -66,7 +66,7 @@ var tMallShopDetailSpider = {
                     return;
                 }
                 if(realUrl.href.indexOf(".world")){
-                    requestShopDetail(realUrl.replace("\.world",""));
+                    requestShopDetail(realUrl.href.replace("\.world",""));
                     return;
                 }
                 var htmlContent = new BufferHelper();
