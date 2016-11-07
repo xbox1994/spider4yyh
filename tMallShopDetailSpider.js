@@ -65,10 +65,10 @@ var tMallShopDetailSpider = {
                     requestShopDetail(res.headers.location);
                     return;
                 }
-                if(realUrl.href.indexOf(".world")){
-                    requestShopDetail(realUrl.href.replace("\.world",""));
-                    return;
-                }
+                //if(realUrl.href.indexOf(".world")){
+                //    requestShopDetail(realUrl.href.replace("\.world",""));
+                //    return;
+                //}
                 var htmlContent = new BufferHelper();
 
                 res.on('data', function (chunk) {
